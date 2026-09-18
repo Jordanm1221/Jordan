@@ -1,0 +1,16 @@
+{
+  "name": "roa-gemini-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MCP server that lets Claude ask Google Gemini questions.",
+  "type": "module",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@google/genai": "^2.23.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^3.25.0"
+  }
+}
