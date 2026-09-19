@@ -5,7 +5,7 @@
       "args": ["mcp/gemini/server.js"],
       "env": {
         "GEMINI_API_KEY": "${GEMINI_API_KEY:-}",
-        "GEMINI_MODEL": "${GEMINI_MODEL:-gemini-2.5-pro}"
+        "GEMINI_MODEL": "${GEMINI_MODEL:-gemini-flash-latest}"
       }
     }
   }

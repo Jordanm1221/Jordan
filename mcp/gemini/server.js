@@ -14,7 +14,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { GoogleGenAI } from '@google/genai';
 import { z } from 'zod';
 
-const DEFAULT_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-pro';
+const DEFAULT_MODEL = process.env.GEMINI_MODEL || 'gemini-flash-latest';
 
 // Read the key lazily so the server still starts (and reports a clear error)
 // when the key is missing, instead of dying during the MCP handshake.
@@ -33,9 +33,37 @@ function textResult(text) {
   return { content: [{ type: 'text', text }] };
 }
 
+/**
+ * Turn a Gemini API failure into one readable line, plus a hint for the two
+ * cases that actually come up: a retired model, and free-tier quota.
+ */
 function errorResult(err) {
-  const message = err instanceof Error ? err.message : String(err);
-  return { content: [{ type: 'text', text: `Gemini error: ${message}` }], isError: true };
+  const raw = err instanceof Error ? err.message : String(err);
+
+  let code;
+  let message = raw;
+  try {
+    const parsed = JSON.parse(raw).error;
+    if (parsed) {
+      code = parsed.code;
+      message = parsed.message || raw;
+    }
+  } catch {
+    // Not a Google API error envelope; use the message as-is.
+  }
+
+  const hints = {
+    404: 'That model is retired or misspelled. Run list_gemini_models to see what this key can use.',
+    429: 'Free-tier quota. Pro models and Google Search grounding need billing enabled at https://aistudio.google.com/apikey — Flash models still work without it.',
+    401: 'The API key was rejected. Check GEMINI_API_KEY.',
+    403: 'The API key was rejected. Check GEMINI_API_KEY.',
+  };
+  const hint = hints[code];
+
+  return {
+    content: [{ type: 'text', text: `Gemini error: ${message.trim()}${hint ? `\n\n${hint}` : ''}` }],
+    isError: true,
+  };
 }
 
 /** Pull the answer text plus any grounding sources out of a Gemini response. */
@@ -119,7 +147,8 @@ server.registerTool(
       for await (const model of await ai.models.list()) {
         const actions = model.supportedActions ?? [];
         if (actions.length && !actions.includes('generateContent')) continue;
-        names.push(`- ${model.name}${model.displayName ? ` (${model.displayName})` : ''}`);
+        const id = (model.name || '').replace(/^models\//, '');
+        names.push(`- ${id}${model.displayName ? ` (${model.displayName})` : ''}`);
       }
       return textResult(names.length ? names.join('\n') : 'No models returned.');
     } catch (err) {
