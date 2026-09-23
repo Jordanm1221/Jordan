@@ -62,7 +62,7 @@
   }
 
   trails.forEach(function (t) {
-    var m = L.marker([t.lat, t.lng], { icon: pinIcon(t, false), title: t.name, keyboard: true })
+    var m = L.marker([t.lat, t.lng], { icon: pinIcon(t, false), title: t.name, keyboard: true, riseOnHover: true })
       .addTo(map)
       .on("click", function () { select(t.id, false); });
     m.bindTooltip(t.name, { direction: "top", offset: [0, -16] });
@@ -160,9 +160,9 @@
       '<dl class="specs">' +
         '<div><dt>Difficulty</dt><dd><strong>' + t.rating + '/10</strong>' + esc(r.label) + "</dd></div>" +
         '<div><dt>Length</dt><dd><strong>' + t.miles + ' mi</strong>One way</dd></div>' +
-        '<div><dt>Time</dt><dd><strong>' + t.hours + ' hr</strong>Plan a full ' + (t.hours > 8 ? "two days" : t.hours > 4 ? "day" : "half day") + "</dd></div>" +
-        '<div><dt>Top elevation</dt><dd><strong>' + num(t.elevation) + ' ft</strong>' + (t.elevation >= 10000 ? "Thin air. Bring a jacket." : "Low enough to run year-round in good weather.") + "</dd></div>" +
-        '<div><dt>Best time to go</dt><dd><strong>' + esc(t.season.split(",")[0]) + "</strong>" + esc(t.season.split(",").slice(1).join(",").trim() || " ") + "</dd></div>" +
+        '<div><dt>Time</dt><dd><strong>' + t.hours + ' hr</strong>' + (t.hours > 10 ? "Two-day trip. Plan to camp." : t.hours > 4 ? "Full-day trip" : "Half-day trip") + "</dd></div>" +
+        '<div><dt>Top elevation</dt><dd><strong>' + num(t.elevation) + ' ft</strong>' + (t.elevation >= 10000 ? "Above 10,000 ft. Snow can block it into July." : "Feet above sea level") + "</dd></div>" +
+        '<div><dt>Best time to go</dt><dd><strong>' + t.season.split(",").map(function (x) { return esc(x.trim()); }).join("<br>") + "</strong></dd></div>" +
       "</dl>" +
       '<div class="need"><p class="label">What you need</p><p>' + esc(t.vehicle) + "</p></div>" +
       '<div class="media-pair">' + videoHtml(t) + photosHtml(t) + "</div>" +
