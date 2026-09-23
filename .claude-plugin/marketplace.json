@@ -4,6 +4,9 @@
     "name": "Jordan",
     "email": "jordanm1221@gmail.com"
   },
+  "metadata": {
+    "description": "ROA Off-Road plugins for Claude Code."
+  },
   "plugins": [
     {
       "name": "roa-brand",
