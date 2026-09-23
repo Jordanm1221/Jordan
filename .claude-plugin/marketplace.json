@@ -1,0 +1,14 @@
+{
+  "name": "roa-off-road",
+  "owner": {
+    "name": "Jordan",
+    "email": "jordanm1221@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "roa-brand",
+      "source": "./",
+      "description": "ROA Off-Road brand rules: colors, fonts, vocabulary, and the Obvious Adams writing test."
+    }
+  ]
+}

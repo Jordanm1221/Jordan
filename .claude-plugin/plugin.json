@@ -1,0 +1,11 @@
+{
+  "name": "roa-brand",
+  "version": "0.1.0",
+  "description": "ROA Off-Road brand rules for Claude: colors, fonts, vocabulary, and the Obvious Adams writing test.",
+  "author": {
+    "name": "Jordan",
+    "email": "jordanm1221@gmail.com"
+  },
+  "repository": "https://github.com/jordanm1221/jordan",
+  "keywords": ["roa", "brand", "marketing", "copywriting", "obvious-adams"]
+}
