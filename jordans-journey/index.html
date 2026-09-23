@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Jordan's Journey</title>
+  <meta name="description" content="Off-road trails I have driven, with a map, video, and photos of each one.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top">JORDAN'S JOURNEY</a>
+    <nav class="nav" aria-label="Main">
+      <a href="#map">Map</a>
+      <a href="#videos">Videos</a>
+      <a href="#photos">Photos</a>
+      <a href="#about">About</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <p class="eyebrow">Off-road video and photography</p>
+      <h1>JORDAN'S JOURNEY</h1>
+      <p class="lede">Every trail I drive, on one map. Click a trail to see where it is, how hard it is, what truck you need, and the video and photos from the day.</p>
+      <dl class="totals" aria-label="Totals">
+        <div><dt>Trails</dt><dd id="stat-trails">0</dd></div>
+        <div><dt>Trail miles</dt><dd id="stat-miles">0</dd></div>
+        <div><dt>States</dt><dd id="stat-states">0</dd></div>
+        <div><dt>Videos</dt><dd id="stat-videos">0</dd></div>
+      </dl>
+    </section>
+
+    <section id="map" class="section">
+      <div class="section-head">
+        <h2>TRAIL MAP</h2>
+        <div class="filters" role="group" aria-label="Filter by difficulty" id="filters"></div>
+      </div>
+
+      <div class="map-layout">
+        <div id="leaflet" class="map" aria-label="Map of trails"></div>
+        <ol class="trail-list" id="trail-list" aria-label="Trails"></ol>
+      </div>
+
+      <article class="detail" id="detail" aria-live="polite"></article>
+    </section>
+
+    <section id="videos" class="section">
+      <div class="section-head"><h2>VIDEOS</h2></div>
+      <div class="video-grid" id="video-grid"></div>
+    </section>
+
+    <section id="photos" class="section">
+      <div class="section-head"><h2>PHOTOS</h2></div>
+      <div class="photo-grid" id="photo-grid"></div>
+    </section>
+
+    <section id="about" class="section about">
+      <div class="section-head"><h2>ABOUT</h2></div>
+      <div class="about-body">
+        <p>I'm Jordan. I drive trails, film them, and photograph them.</p>
+        <p>This site is my trail log. Each trail gets a pin on the map, a difficulty rating from 1 to 10, the truck setup you need, and the video and photos from my run.</p>
+        <p>Trail conditions change with weather and season. Check with the local land office before you go, and never drive a hard trail alone.</p>
+      </div>
+      <h3>HOW I RATE DIFFICULTY</h3>
+      <ul class="scale" id="scale"></ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>JORDAN'S JOURNEY</span>
+    <span>Map data © OpenStreetMap contributors, © CARTO</span>
+  </footer>
+
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="lightbox-close" id="lightbox-close" aria-label="Close photo">Close</button>
+    <img id="lightbox-img" alt="">
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+  <script src="js/trails.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
