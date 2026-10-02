@@ -1,0 +1,625 @@
+<title>Daily Intention Ritual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a lit path of eleven stops across the top; below it a board of stops, a one-question-at-a-time ritual, and an evidence wall. */
+:root {
+  --bg: #EDF0F5;
+  --surface: #F9FAFC;
+  --raised: #FFFFFF;
+  --ink: #1B2234;
+  --muted: #586379;
+  --line: #D3D9E4;
+  --path: #C5CEDB;
+  --accent: #9C5810;
+  --glow: #EFAE45;
+  --glow-soft: rgba(239, 174, 69, .20);
+  --on-glow: #2A1A05;
+  --shadow: 0 1px 2px rgba(27, 34, 52, .06), 0 8px 24px rgba(27, 34, 52, .06);
+  --f-display: "Gloock", "Georgia", "Times New Roman", serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #10142A; --surface: #171D36; --raised: #1D2442; --ink: #ECE8DE; --muted: #9AA3BE;
+    --line: #2B3354; --path: #2E375A; --accent: #F2BB62; --glow: #F4BE5E;
+    --glow-soft: rgba(244, 190, 94, .16); --on-glow: #241604;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #10142A; --surface: #171D36; --raised: #1D2442; --ink: #ECE8DE; --muted: #9AA3BE;
+  --line: #2B3354; --path: #2E375A; --accent: #F2BB62; --glow: #F4BE5E;
+  --glow-soft: rgba(244, 190, 94, .16); --on-glow: #241604;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.25);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 28px 20px 64px; display: grid; gap: 28px; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; text-wrap: balance; margin: 0; line-height: 1.15; }
+.eyebrow { font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; border-radius: 6px; }
+
+/* Header */
+header { display: grid; gap: 18px; }
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px 24px; }
+.top h1 { font-size: clamp(30px, 5vw, 46px); }
+.meta { display: flex; gap: 18px; font-family: var(--f-mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
+.meta b { color: var(--ink); font-weight: 600; }
+.intention { font-family: var(--f-display); font-size: clamp(19px, 2.4vw, 24px); line-height: 1.45; max-width: 52ch; margin: 0; }
+.intention em { font-style: normal; background: linear-gradient(transparent 62%, var(--glow-soft) 62%); }
+
+/* Lit path */
+.pathbox { overflow-x: auto; padding: 6px 2px 4px; }
+.path { position: relative; display: grid; grid-template-columns: repeat(11, minmax(64px, 1fr)); min-width: 700px; }
+.path::before { content: ""; position: absolute; left: 32px; right: 32px; top: 17px; height: 2px; background: var(--path); }
+.path .lit { position: absolute; left: 32px; top: 17px; height: 2px; background: var(--glow); box-shadow: 0 0 10px var(--glow); transition: width .6s ease; }
+.stop { position: relative; display: grid; justify-items: center; gap: 6px; background: none; border: 0; padding: 0; }
+.stop .dot { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); border: 2px solid var(--path); font-family: var(--f-mono); font-size: 12px; color: var(--muted); transition: all .3s; }
+.stop.part .dot { border-color: var(--glow); color: var(--ink); }
+.stop.done .dot { background: var(--glow); border-color: var(--glow); color: var(--on-glow); box-shadow: 0 0 0 6px var(--glow-soft), 0 0 18px var(--glow); }
+.stop.here .dot { outline: 2px dashed var(--accent); outline-offset: 4px; }
+.stop .lbl { font-size: 11.5px; color: var(--muted); text-align: center; line-height: 1.2; }
+
+/* Tabs */
+nav.tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.tab { background: none; border: 0; padding: 10px 14px; border-bottom: 2px solid transparent; margin-bottom: -1px; color: var(--muted); font-weight: 700; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--glow); }
+
+/* Board */
+.board { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.card { text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 16px 14px; display: grid; gap: 10px; align-content: start; transition: transform .15s, border-color .15s; min-width: 0; }
+.card:hover { transform: translateY(-2px); border-color: var(--glow); }
+.card.done { border-color: var(--glow); background: linear-gradient(180deg, var(--glow-soft), var(--surface) 70%); }
+.card h3 { font-size: 21px; }
+.card .first { color: var(--muted); font-size: 14px; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pips { display: flex; gap: 4px; flex-wrap: wrap; }
+.pip { width: 18px; height: 6px; border-radius: 3px; background: var(--path); }
+.pip.on { background: var(--glow); }
+.card .foot { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Ritual */
+.ritual { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 28px; align-items: start; }
+.steps { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); display: grid; gap: 2px; }
+.steps button { text-align: left; background: none; border: 0; padding: 7px 10px; border-radius: 8px; color: var(--muted); font-size: 14px; display: flex; gap: 10px; align-items: center; }
+.steps button[aria-current="step"] { background: var(--surface); color: var(--ink); font-weight: 700; }
+.steps .tick { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--path); flex: none; }
+.steps .tick.on { background: var(--glow); border-color: var(--glow); }
+.stage { background: var(--raised); border: 1px solid var(--line); border-radius: 20px; box-shadow: var(--shadow); padding: clamp(20px, 4vw, 44px); display: grid; gap: 22px; min-height: 440px; align-content: start; min-width: 0; }
+.stage .head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+.stage .count { font-family: var(--f-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.question { font-family: var(--f-display); font-size: clamp(24px, 3.6vw, 36px); line-height: 1.25; margin: 0; max-width: 28ch; }
+.question .why { color: var(--accent); }
+.hint { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 13px; color: var(--muted); }
+.chip:hover { border-color: var(--glow); color: var(--ink); }
+label.ev { display: grid; gap: 8px; }
+textarea { width: 100%; min-height: 150px; resize: vertical; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); font: 17px/1.55 var(--f-body); padding: 14px 16px; }
+textarea:focus { outline: 2px solid var(--glow); outline-offset: 0; border-color: transparent; }
+.saved { font-family: var(--f-mono); font-size: 12px; color: var(--muted); min-height: 1em; }
+.controls { display: flex; gap: 10px; justify-content: space-between; flex-wrap: wrap; align-items: center; }
+.btn { border-radius: 999px; padding: 10px 20px; border: 1px solid var(--line); background: var(--surface); font-weight: 700; }
+.btn.primary { background: var(--glow); border-color: var(--glow); color: var(--on-glow); }
+.btn.primary:hover { filter: brightness(1.05); }
+.btn:disabled { opacity: .4; cursor: default; }
+.affirm { font-family: var(--f-display); font-size: clamp(22px, 3vw, 30px); line-height: 1.35; margin: 0; }
+.affirm span { display: block; }
+
+/* Breath */
+.breath { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 28px; align-items: center; }
+.breath svg { width: 200px; max-width: 100%; height: auto; }
+.breath .phase { font-family: var(--f-display); font-size: 34px; }
+.breath .sub { color: var(--muted); }
+.breath .num { font-family: var(--f-mono); font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Pause */
+.pause { display: grid; justify-items: start; gap: 18px; }
+.pause .ring { width: 120px; height: 120px; }
+.pause p { font-family: var(--f-display); font-size: clamp(22px, 3vw, 30px); line-height: 1.35; margin: 0; max-width: 30ch; }
+
+/* Received */
+.recv { display: grid; gap: 8px; }
+.recv button { text-align: left; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.recv button .box { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--path); margin-top: 2px; }
+.recv button[aria-pressed="true"] { border-color: var(--glow); background: var(--glow-soft); }
+.recv button[aria-pressed="true"] .box { background: var(--glow); border-color: var(--glow); box-shadow: 0 0 10px var(--glow); }
+
+/* Evidence wall */
+.wall { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 28px; align-items: start; }
+.bars { display: grid; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; }
+.bars h3 { font-size: 20px; }
+.bar { display: grid; grid-template-columns: 96px minmax(0, 1fr) 28px; gap: 10px; align-items: center; font-size: 13px; background: none; border: 0; padding: 2px 0; text-align: left; }
+.bar .track { height: 10px; background: var(--path); border-radius: 5px; overflow: hidden; }
+.bar .fill { height: 100%; background: var(--glow); border-radius: 5px; }
+.bar .n { font-family: var(--f-mono); font-size: 12px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.bar[aria-pressed="true"] { font-weight: 700; }
+.bars .scale { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 11px; color: var(--muted); padding-left: 106px; padding-right: 38px; }
+.feed { display: grid; gap: 14px; min-width: 0; }
+.feed .day { font-family: var(--f-mono); font-size: 12px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; padding-top: 8px; }
+.entry { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 6px; min-width: 0; }
+.entry .q { color: var(--muted); font-size: 14px; }
+.entry .a { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.empty { color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: var(--r); padding: 22px; }
+.mode { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--surface); }
+.mode button { border: 0; background: none; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; color: var(--muted); }
+.mode button[aria-pressed="true"] { background: var(--glow); color: var(--on-glow); }
+.store-note { font-size: 12.5px; color: var(--muted); }
+
+@media (max-width: 760px) {
+  .ritual, .wall { grid-template-columns: minmax(0, 1fr); }
+  .steps { position: static; display: flex; overflow-x: auto; gap: 4px; padding-bottom: 4px; }
+  .steps button { white-space: nowrap; }
+  .breath { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="top">
+      <div style="display:grid;gap:6px">
+        <span class="eyebrow" id="today-label">Today</span>
+        <h1>My Daily Intention Ritual</h1>
+      </div>
+      <div class="meta">
+        <span><b id="m-answered">0</b> answered today</span>
+        <span><b id="m-streak">0</b>-day streak</span>
+        <span><b id="m-total">0</b> pieces of evidence</span>
+      </div>
+    </div>
+    <p class="intention">I walk in <em>faith</em>, <em>calm and confident</em>, allowing Heavenly Father's plan to unfold. I am a <em>devoted husband and father</em>, <em>strong and healthy</em> in body, a <em>creative leader</em> in my work, and a man who lives in <em>abundance</em>. Everything flows through me with ease.</p>
+    <div class="pathbox" aria-label="Today's path">
+      <div class="path" id="path"><div class="lit" id="lit"></div></div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-board" data-view="board" aria-selected="true">Board</button>
+    <button class="tab" role="tab" id="tab-ritual" data-view="ritual" aria-selected="false">Walk the ritual</button>
+    <button class="tab" role="tab" id="tab-wall" data-view="wall" aria-selected="false">Evidence wall</button>
+  </nav>
+
+  <section id="view-board"></section>
+  <section id="view-ritual" hidden></section>
+  <section id="view-wall" hidden></section>
+  <p class="store-note" id="store-note">Your answers are saved in this browser.</p>
+</div>
+
+<script>
+const SECTIONS = [
+  { id: "arrive", n: 1, title: "Arrive", short: "Arrive", breath: true,
+    lines: ["Hum on the exhale. Ohhhmmm.", "Everything will be okay."],
+    qs: ["Why will everything be okay, and what does that feel like in my body right now?"],
+    pause: "Pause." },
+  { id: "faith", n: 2, title: "Faith and Trust", short: "Faith",
+    qs: ["Why do I trust that Heavenly Father has already prepared the way before me, before I can even see it?",
+      "Why do I move forward from a place of peace, knowing His plan was designed for me specifically?",
+      "Why am I in the perfect place at the perfect time?",
+      "Why does taking each step in faith turn my fear into calm, and my anxiety into excitement?",
+      "Why am I no longer afraid that it could all go away?"],
+    pause: "Picture yourself walking a path that is already lit a few steps ahead of you." },
+  { id: "family", n: 3, title: "Laura and Our Family", short: "Family",
+    qs: ["Why does Laura feel so deeply loved by me today?",
+      "Why do I so easily do the little things that show her she is number one in my life?",
+      "Why does Laura feel safe, calm, and cared for with me?",
+      "Why am I becoming the best husband and the best father?",
+      "Why do I trust that our child is on the way to us, healthy and perfect, in Heavenly Father's timing?",
+      "What will it feel like the moment we tell our families we are pregnant?"],
+    pause: "See Laura's face. See yourself holding your baby. Feel it." },
+  { id: "health", n: 4, title: "Health and Body", short: "Health",
+    qs: ["Why do I feel so energized, clear, and strong today?",
+      "Why is my body healing, my elbow getting stronger, and my energy rising every day?",
+      "Why do I love fueling my body and doing my ab wheel every morning?",
+      "Why are Laura and I both healthy, strong, and full of life?",
+      "Why is my body becoming lean, muscular, and athletic, with visible abs?"],
+    pause: "Feel your posture. Ears over heart, heart over hips. Feel your strength." },
+  { id: "becoming", n: 5, title: "Confidence and Who I Am Becoming", short: "Becoming",
+    qs: ["Who am I becoming today?",
+      "Why am I an athlete, a reader, a banjo player, a leader, and a man of faith?",
+      "Why do I speak, walk, and present myself with calm confidence?",
+      "Why is communicating clearly and confidently my new superpower?",
+      "Why do I trust my inner voice and my own abilities?",
+      "Why would people who knew me before barely recognize who I am in 2026?"],
+    pause: "See yourself walking into a meeting completely at ease." },
+  { id: "work", n: 6, title: "Work and Creativity", short: "Work",
+    qs: ["Why do Shane, Cynthia, and the leadership team value my contributions so much?",
+      "Why do I bring such valuable ideas and leadership to ROA?",
+      "Why do my edits flow so easily, and why is my footage so cinematic and creative?",
+      "Why are my videos reaching more people than ever?",
+      "Why do I understand Claude, skills, and new tools so easily?",
+      "Why am I growing into a raise and new streams of income?"],
+    pause: "See the finished edit. Hear the praise. Feel the pride." },
+  { id: "wealth", n: 7, title: "Wealth and Abundance", short: "Wealth",
+    qs: ["Why do I feel worthy of wealth and success today?",
+      "Why do I think like a man who never worries about money?",
+      "Why do I enjoy budgeting and simple math so much now?",
+      "Why are our credit cards paid off, and why do we save more every month with plenty left over?",
+      "Why do I see endless opportunities around me?",
+      "What would it feel like to never worry about money again?"],
+    pause: "See your bank account. Feel how calm and generous you are with plenty." },
+  { id: "received", n: 8, title: "Already Received", short: "Received",
+    blessings: ["My truck was repaired and fully covered under warranty, running better than ever.",
+      "Laura's parents gifted us the funding for IVF.",
+      "Laura found affordable medications.",
+      "Twenty-five eggs were retrieved, and we got grade A embryos.",
+      "My DNA fragmentation results were healthy, and I needed no surgery.",
+      "CLAWS covered the medical bills with no questions asked.",
+      "Our taxes were done smoothly, with a twenty-five hundred dollar refund.",
+      "We finished the Roamer X full tour quickly and got beautiful shots.",
+      "We had the best anniversary, and we feel peace knowing Buddy is happy."],
+    qs: ["Why was I blessed so much already this year?",
+      "Why did all of this come to me? And what else is already on its way?"],
+    pause: "Feel the gratitude." },
+  { id: "release", n: 9, title: "Release", short: "Release",
+    qs: ["Is anything weighing on me today? What am I afraid of?",
+      "Can I let myself feel it fully, and love it, instead of running from it?",
+      "Why do my fears turn into excitement?",
+      "Why do I let go of all resistance and simply allow?"],
+    pause: "Breathe out whatever is left." },
+  { id: "today", n: 10, title: "Today", short: "Today",
+    qs: ["What is the most important thing I can do today?",
+      "What is one thing that would make everything else easier?",
+      "Whatever comes up today, how can I solve it in a fun and easy way?",
+      "Why will today be one of the best days I have had?"],
+    affirm: ["I am excited.", "I am excited.", "I really feel excited."] },
+  { id: "evening", n: 11, title: "Evening Close", short: "Evening", evening: true,
+    lines: ["On my knees, I look back over today."],
+    qs: ["What blessings and luck did I see today?",
+      "What evidence did I see that my intentions are unfolding?",
+      "Why am I too blessed to be stressed?"],
+    affirm: ["Thank you, Heavenly Father."] }
+];
+const HINTS = {
+  default: ["A moment this week that proves it", "Something someone said or did", "A fact or number", "How it feels in my body"],
+  arrive: ["Times things worked out before", "Where I feel calm in my body"],
+  faith: ["A door that opened before I saw it", "A time fear turned out fine", "A sign of His timing"],
+  family: ["A little thing I did for Laura", "Her words or her face", "A moment with family"],
+  health: ["Today's workout or meal", "Elbow progress", "Energy level today"],
+  becoming: ["A conversation I led well", "A page I read or a song I played", "Someone noticed a change"],
+  work: ["Feedback from Shane or Cynthia", "A shot or edit I'm proud of", "Views or reach numbers", "A new tool I learned"],
+  wealth: ["A balance paid down", "Money saved this month", "An opportunity I spotted"],
+  received: ["A new blessing this week", "Something on its way"],
+  release: ["Name the fear plainly", "What it might be excited about"],
+  today: ["The one task", "The fun way through"],
+  evening: ["Luck I noticed", "A sign of an intention unfolding"]
+};
+
+// ---------- state ----------
+const todayKey = (() => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); })();
+let days = {};          // { "YYYY-MM-DD": { answers: {qid: text}, felt: {i: true}, done: {sid: true} } }
+let view = "board";
+let cur = { s: 0, step: 0 };
+let wallFilter = null;
+let remote = null;      // db doc ref for today when the store is available
+let col = null;
+const LS = "intention-ritual-v1";
+
+function lsRead() { try { return JSON.parse(localStorage.getItem(LS) || "{}"); } catch (e) { return {}; } }
+function lsWrite() { try { localStorage.setItem(LS, JSON.stringify(days)); } catch (e) {} }
+days = lsRead();
+function today() { return days[todayKey] || (days[todayKey] = { answers: {}, felt: {}, done: {} }); }
+
+const qid = (s, i) => s.id + "-" + i;
+function answeredIn(day, s) { return s.qs.filter((_, i) => (day?.answers?.[qid(s, i)] || "").trim()).length; }
+function sectionState(s) {
+  const d = days[todayKey]; const a = answeredIn(d, s);
+  if (d?.done?.[s.id]) return "done";
+  return a > 0 ? "part" : "";
+}
+
+// ---------- saving ----------
+let saveTimer = null, saving = false, dirty = false;
+function markDirty() {
+  dirty = true; lsWrite();
+  const el = document.getElementById("saved"); if (el) el.textContent = "Saving…";
+  clearTimeout(saveTimer); saveTimer = setTimeout(flush, 900);
+}
+async function flush() {
+  if (!dirty) return;
+  if (!remote) { dirty = false; setSaved("Saved"); return; }
+  if (saving) { saveTimer = setTimeout(flush, 600); return; }
+  saving = true; dirty = false;
+  try { await remote.set(JSON.parse(JSON.stringify(today()))); setSaved("Saved"); }
+  catch (e) { setSaved("Saved in this browser only. The sync service refused the save."); }
+  saving = false;
+  if (dirty) flush();
+}
+function setSaved(t) { const el = document.getElementById("saved"); if (el) el.textContent = t; }
+
+// ---------- header ----------
+function renderHeader() {
+  const d = new Date();
+  document.getElementById("today-label").textContent = d.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+  const path = document.getElementById("path");
+  path.querySelectorAll(".stop").forEach(n => n.remove());
+  let lastDone = -1;
+  SECTIONS.forEach((s, i) => {
+    const st = sectionState(s);
+    if (st === "done") lastDone = i;
+    const b = document.createElement("button");
+    b.className = "stop " + st + (view === "ritual" && cur.s === i ? " here" : "");
+    b.innerHTML = `<span class="dot">${s.evening ? "☾" : s.n}</span><span class="lbl">${s.short}</span>`;
+    b.setAttribute("aria-label", s.title + (st === "done" ? ", complete" : ""));
+    b.onclick = () => openSection(i);
+    path.appendChild(b);
+  });
+  // light the path up to the furthest completed stop
+  const lit = document.getElementById("lit");
+  const frac = lastDone <= 0 ? 0 : lastDone / (SECTIONS.length - 1);
+  lit.style.width = `calc((100% - 64px) * ${frac})`;
+
+  const t = days[todayKey];
+  const answered = t ? Object.values(t.answers || {}).filter(v => (v || "").trim()).length : 0;
+  document.getElementById("m-answered").textContent = answered;
+  let total = 0;
+  Object.values(days).forEach(dd => Object.values(dd.answers || {}).forEach(v => { if ((v || "").trim()) total++; }));
+  document.getElementById("m-total").textContent = total;
+  document.getElementById("m-streak").textContent = streak();
+}
+function streak() {
+  const has = k => Object.values(days[k]?.answers || {}).some(v => (v || "").trim());
+  let n = 0; const d = new Date();
+  if (!has(todayKey)) d.setDate(d.getDate() - 1);
+  for (;;) {
+    const k = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    if (!has(k)) break; n++; d.setDate(d.getDate() - 1);
+  }
+  return n;
+}
+
+// ---------- board ----------
+function renderBoard() {
+  const el = document.getElementById("view-board");
+  const hour = new Date().getHours();
+  el.innerHTML = `<div class="board"></div>`;
+  const grid = el.firstChild;
+  SECTIONS.forEach((s, i) => {
+    const a = answeredIn(days[todayKey], s);
+    const st = sectionState(s);
+    const b = document.createElement("button");
+    b.className = "card " + st;
+    b.innerHTML = `
+      <span class="eyebrow">${s.evening ? "Evening" : "Stop " + s.n}${s.evening && hour >= 17 ? " · now" : ""}</span>
+      <h3>${s.title}</h3>
+      <p class="first">${s.qs[0]}</p>
+      <div class="pips">${s.qs.map((_, j) => `<span class="pip ${(days[todayKey]?.answers?.[qid(s, j)] || "").trim() ? "on" : ""}"></span>`).join("")}</div>
+      <div class="foot"><span>${a} of ${s.qs.length} answered</span><span>${st === "done" ? "Lit" : st === "part" ? "In progress" : "Begin"}</span></div>`;
+    b.onclick = () => openSection(i);
+    grid.appendChild(b);
+  });
+}
+
+// ---------- ritual ----------
+function stepsFor(s) {
+  const st = [];
+  if (s.breath) st.push({ t: "breath", label: "Box breathe" });
+  if (s.lines) st.push({ t: "lines", label: s.evening ? "Kneel" : "Hum" });
+  if (s.blessings) st.push({ t: "blessings", label: "Already received" });
+  s.qs.forEach((q, i) => st.push({ t: "q", i, label: "Question " + (i + 1) }));
+  if (s.affirm) st.push({ t: "affirm", label: s.evening ? "Thank you" : "I am excited" });
+  if (s.pause) st.push({ t: "pause", label: "Pause" });
+  return st;
+}
+function openSection(i, step = 0) {
+  cur = { s: i, step };
+  setView("ritual");
+}
+let breathTimer = null, pauseTimer = null;
+function stopTimers() { clearInterval(breathTimer); clearInterval(pauseTimer); breathTimer = pauseTimer = null; }
+
+function renderRitual() {
+  stopTimers();
+  const s = SECTIONS[cur.s];
+  const steps = stepsFor(s);
+  cur.step = Math.max(0, Math.min(cur.step, steps.length - 1));
+  const step = steps[cur.step];
+  const el = document.getElementById("view-ritual");
+  const day = today();
+  el.innerHTML = `
+    <div class="ritual">
+      <div class="steps" role="list">${steps.map((p, j) => {
+        const on = p.t === "q" ? (day.answers[qid(s, p.i)] || "").trim() : j < cur.step;
+        return `<button role="listitem" data-j="${j}" ${j === cur.step ? 'aria-current="step"' : ""}><span class="tick ${on ? "on" : ""}"></span>${p.label}</button>`;
+      }).join("")}</div>
+      <div class="stage" id="stage"></div>
+    </div>`;
+  el.querySelectorAll(".steps button").forEach(b => b.onclick = () => { cur.step = +b.dataset.j; renderRitual(); renderHeader(); });
+  const stage = el.querySelector("#stage");
+  const head = `<div class="head"><div style="display:grid;gap:4px"><span class="eyebrow">${s.evening ? "Evening close" : "Stop " + s.n + " of 10"}</span><h2 style="font-size:24px">${s.title}</h2></div><span class="count">${cur.step + 1} / ${steps.length}</span></div>`;
+  const isLast = cur.step === steps.length - 1;
+  const nextLabel = isLast ? (cur.s < SECTIONS.length - 1 ? "Light this stop, go to " + SECTIONS[cur.s + 1].short : "Light the last stop") : "Next";
+  const controls = `<div class="controls"><button class="btn" id="prev" ${cur.s === 0 && cur.step === 0 ? "disabled" : ""}>Back</button><button class="btn primary" id="next">${nextLabel}</button></div>`;
+
+  if (step.t === "q") {
+    const id = qid(s, step.i);
+    const q = s.qs[step.i];
+    const qHtml = q.startsWith("Why") ? `<span class="why">Why</span>${esc(q.slice(3))}` : esc(q);
+    const hints = HINTS[s.id] || HINTS.default;
+    stage.innerHTML = `${head}
+      <p class="question">${qHtml}</p>
+      <label class="ev" for="ans"><span class="eyebrow">${q.startsWith("Why") ? "Search for the evidence. Why is this already true?" : "Answer from what you have seen and felt"}</span>
+      <textarea id="ans" placeholder="Write what you notice. Specific moments, names, numbers, feelings."></textarea></label>
+      <div class="hint">${hints.map(h => `<button class="chip" data-h="${esc(h)}">${esc(h)}</button>`).join("")}</div>
+      <span class="saved" id="saved"></span>
+      ${controls}`;
+    const ta = stage.querySelector("#ans");
+    ta.value = day.answers[id] || "";
+    ta.oninput = () => { today().answers[id] = ta.value; markDirty(); renderHeader(); };
+    stage.querySelectorAll(".chip").forEach(c => c.onclick = () => {
+      const pre = c.dataset.h + ": ";
+      ta.value = (ta.value.trim() ? ta.value.replace(/\s*$/, "\n") : "") + pre;
+      ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
+      ta.oninput();
+    });
+  } else if (step.t === "breath") {
+    stage.innerHTML = `${head}
+      <div class="breath">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <rect x="30" y="30" width="140" height="140" rx="10" fill="none" stroke="var(--path)" stroke-width="4"/>
+          <rect id="trail" x="30" y="30" width="140" height="140" rx="10" fill="none" stroke="var(--glow)" stroke-width="4" stroke-dasharray="560" stroke-dashoffset="560" pathLength="560"/>
+          <circle id="orb" cx="30" cy="170" r="11" fill="var(--glow)"/>
+        </svg>
+        <div style="display:grid;gap:6px">
+          <span class="phase" id="phase">Ready</span>
+          <span class="num" id="bnum">4 rounds · 6 seconds each side</span>
+          <span class="sub" id="bsub">In for six. Hold for six. Out for six. Hold for six. Hum on the exhale.</span>
+          <div><button class="btn" id="bstart" style="margin-top:8px">Begin breathing</button></div>
+        </div>
+      </div>
+      ${controls}`;
+    stage.querySelector("#bstart").onclick = startBreath;
+  } else if (step.t === "lines") {
+    stage.innerHTML = `${head}<p class="affirm">${s.lines.map(l => `<span>${esc(l)}</span>`).join("")}</p>${controls}`;
+  } else if (step.t === "blessings") {
+    stage.innerHTML = `${head}
+      <p class="eyebrow">Tap each one as you feel it again</p>
+      <div class="recv">${s.blessings.map((b, j) => `<button aria-pressed="${day.felt[j] ? "true" : "false"}" data-j="${j}"><span class="box"></span><span>${esc(b)}</span></button>`).join("")}</div>
+      <span class="saved" id="saved"></span>
+      ${controls}`;
+    stage.querySelectorAll(".recv button").forEach(b => b.onclick = () => {
+      const j = b.dataset.j; const v = !today().felt[j];
+      if (v) today().felt[j] = true; else delete today().felt[j];
+      b.setAttribute("aria-pressed", v ? "true" : "false"); markDirty();
+    });
+  } else if (step.t === "affirm") {
+    stage.innerHTML = `${head}<p class="affirm">${s.affirm.map((l, j) => `<span style="font-size:${100 + j * 12}%">${esc(l)}</span>`).join("")}</p>${controls}`;
+  } else if (step.t === "pause") {
+    stage.innerHTML = `${head}
+      <div class="pause">
+        <span class="eyebrow">Pause</span>
+        <svg class="ring" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--path)" stroke-width="6"/><circle id="pring" cx="60" cy="60" r="52" fill="none" stroke="var(--glow)" stroke-width="6" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" transform="rotate(-90 60 60)"/><text id="ptext" x="60" y="66" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="18" fill="var(--ink)">30</text></svg>
+        <p>${esc(s.pause)}</p>
+      </div>
+      ${controls}`;
+    let t = 0; const ring = stage.querySelector("#pring"), tx = stage.querySelector("#ptext");
+    pauseTimer = setInterval(() => { t++; ring.setAttribute("stroke-dashoffset", 100 - t / 30 * 100); tx.textContent = Math.max(0, 30 - t); if (t >= 30) { clearInterval(pauseTimer); tx.textContent = "✓"; } }, 1000);
+  }
+
+  stage.querySelector("#prev").onclick = () => {
+    if (cur.step > 0) cur.step--; else if (cur.s > 0) { cur.s--; cur.step = stepsFor(SECTIONS[cur.s]).length - 1; }
+    renderRitual(); renderHeader();
+  };
+  stage.querySelector("#next").onclick = () => {
+    if (!isLast) { cur.step++; }
+    else {
+      today().done[s.id] = true; markDirty();
+      if (cur.s < SECTIONS.length - 1) { cur.s++; cur.step = 0; }
+      else { setView("wall"); renderHeader(); return; }
+    }
+    renderRitual(); renderHeader();
+    window.scrollTo({ top: document.querySelector("nav.tabs").offsetTop - 12, behavior: "smooth" });
+  };
+}
+
+function startBreath() {
+  const orb = document.getElementById("orb"), trail = document.getElementById("trail");
+  const phase = document.getElementById("phase"), num = document.getElementById("bnum"), sub = document.getElementById("bsub");
+  const btn = document.getElementById("bstart"); btn.hidden = true;
+  // corners: bottom-left → top-left (in) → top-right (hold) → bottom-right (out) → bottom-left (hold)
+  const C = [[30, 170], [30, 30], [170, 30], [170, 170], [30, 170]];
+  const names = ["Breathe in", "Hold", "Breathe out, hum", "Hold"];
+  const subs = ["Slowly, through the nose.", "Stay soft.", "Ohhhmmm.", "Everything will be okay."];
+  const SIDE = 6, TOTAL = SIDE * 4 * 4; let t = 0;
+  const tick = () => {
+    if (t >= TOTAL) { clearInterval(breathTimer); phase.textContent = "Arrived"; sub.textContent = "Everything will be okay."; num.textContent = "4 rounds complete"; return; }
+    const side = Math.floor(t / SIDE) % 4, within = t % SIDE, round = Math.floor(t / (SIDE * 4)) + 1;
+    const f = (within + 1) / SIDE, a = C[side], b = C[side + 1];
+    orb.setAttribute("cx", a[0] + (b[0] - a[0]) * f); orb.setAttribute("cy", a[1] + (b[1] - a[1]) * f);
+    trail.setAttribute("stroke-dashoffset", 560 - (side + f) * 140);
+    phase.textContent = names[side]; sub.textContent = subs[side];
+    num.textContent = `Round ${round} of 4 · ${SIDE - within}`;
+    t++;
+  };
+  orb.style.transition = "cx 1s linear, cy 1s linear"; trail.style.transition = "stroke-dashoffset 1s linear";
+  tick(); breathTimer = setInterval(tick, 1000);
+}
+
+// ---------- evidence wall ----------
+function renderWall() {
+  const el = document.getElementById("view-wall");
+  const counts = {}; SECTIONS.forEach(s => counts[s.id] = 0);
+  const keys = Object.keys(days).sort().reverse();
+  keys.forEach(k => Object.entries(days[k].answers || {}).forEach(([id, v]) => { if ((v || "").trim()) counts[id.split("-")[0]]++; }));
+  const max = Math.max(1, ...Object.values(counts));
+  const top = Math.max(4, Math.ceil(max / 4) * 4);
+  let feed = "";
+  keys.forEach(k => {
+    const items = [];
+    SECTIONS.forEach(s => s.qs.forEach((q, i) => {
+      const v = (days[k].answers?.[qid(s, i)] || "").trim();
+      if (v && (!wallFilter || wallFilter === s.id)) items.push(`<article class="entry"><span class="eyebrow">${s.title}</span><span class="q">${esc(q)}</span><p class="a">${esc(v)}</p></article>`);
+    }));
+    if (items.length) feed += `<div class="day">${new Date(k + "T12:00").toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" })}</div>` + items.join("");
+  });
+  el.innerHTML = `
+    <div class="wall">
+      <div class="bars">
+        <h3>Where the evidence is piling up</h3>
+        <span class="store-note">Every answer you write is proof that an intention is unfolding. Tap a row to filter.</span>
+        ${SECTIONS.map(s => `<button class="bar" data-id="${s.id}" aria-pressed="${wallFilter === s.id}"><span>${s.short}</span><span class="track"><span class="fill" style="display:block;width:${counts[s.id] / top * 100}%"></span></span><span class="n">${counts[s.id]}</span></button>`).join("")}
+        <div class="scale"><span>0</span><span>${top / 2}</span><span>${top}</span></div>
+      </div>
+      <div class="feed">${feed || `<div class="empty">No evidence ${wallFilter ? "for this area " : ""}yet. Open the <b>Board</b> or <b>Walk the ritual</b>, answer a why question, and it will appear here with today's date.</div>`}</div>
+    </div>`;
+  el.querySelectorAll(".bar").forEach(b => b.onclick = () => { wallFilter = wallFilter === b.dataset.id ? null : b.dataset.id; renderWall(); });
+}
+
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+function setView(v) {
+  view = v;
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.view === v));
+  ["board", "ritual", "wall"].forEach(n => document.getElementById("view-" + n).hidden = n !== v);
+  if (v !== "ritual") stopTimers();
+  if (v === "board") renderBoard(); else if (v === "ritual") renderRitual(); else renderWall();
+  renderHeader();
+}
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
+  if (t.dataset.view === "ritual" && view !== "ritual") {
+    // resume at the first stop that is not lit yet; evenings go straight to the close
+    const h = new Date().getHours();
+    const idx = h >= 17 ? SECTIONS.length - 1 : Math.max(0, SECTIONS.findIndex(s => !today().done[s.id]));
+    cur = { s: idx, step: 0 };
+  }
+  setView(t.dataset.view);
+});
+
+setView("board");
+
+// ---------- sync across devices when the page runs on claude.ai ----------
+(async () => {
+  if (!window.claude?.use) return;
+  try {
+    const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+    if (!db || !user) return;
+    const id = await user.id();
+    if (!id) return;
+    col = db.collection("data/users/" + id);
+    remote = col.doc(todayKey);
+    document.getElementById("store-note").textContent = "Your answers are private to you and sync across your devices.";
+    let first = true;
+    col.onSnapshot(snap => {
+      snap.docs.forEach(d => {
+        if (!d.exists) return;
+        if (d.id === todayKey && (dirty || saving)) return; // keep what is being typed
+        days[d.id] = JSON.parse(JSON.stringify(d.data()));
+      });
+      // first sync: push anything only this browser has for today
+      if (first) { first = false; if (!snap.docs.some(d => d.id === todayKey) && Object.keys(lsRead()[todayKey]?.answers || {}).length) { days[todayKey] = lsRead()[todayKey]; dirty = true; flush(); } }
+      lsWrite();
+      renderHeader();
+      if (view === "board") renderBoard();
+      else if (view === "wall") renderWall();
+      else if (document.activeElement?.id !== "ans" && !breathTimer && !pauseTimer) renderRitual();
+    }, () => { document.getElementById("store-note").textContent = "Sync paused. Your answers are saved in this browser."; });
+  } catch (e) {}
+})();
+</script>
