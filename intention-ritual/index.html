@@ -121,8 +121,8 @@ textarea:focus { outline: 2px solid var(--glow); outline-offset: 0; border-color
 /* Pause */
 .pause { display: grid; justify-items: start; gap: 18px; }
 .pause .ring { width: 120px; height: 120px; }
-.pause .sound { display: inline-flex; align-items: center; gap: 8px; }
-.pause .sound[aria-pressed="true"] { border-color: var(--glow); }
+.sound { display: inline-flex; align-items: center; gap: 8px; }
+.sound[aria-pressed="true"] { border-color: var(--glow); }
 .pause p { font-family: var(--f-display); font-size: clamp(22px, 3vw, 30px); line-height: 1.35; margin: 0; max-width: 30ch; }
 
 /* Received */
@@ -415,7 +415,7 @@ function openSection(i, step = 0) {
   setView("ritual");
 }
 let breathTimer = null, pauseTimer = null;
-function stopTimers() { clearInterval(breathTimer); clearInterval(pauseTimer); breathTimer = pauseTimer = null; stopAmbient(); }
+function stopTimers() { clearInterval(breathTimer); clearInterval(pauseTimer); breathTimer = pauseTimer = null; stopAmbient(); stopBreathSounds(); }
 
 // ---------- pause ambience: a slow-swelling D major pad over a soft wave of brown noise, made live in the browser ----------
 let actx = null, amb = null;
@@ -462,6 +462,64 @@ function stopAmbient() {
   master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.linearRampToValueAtTime(0, t + 1.5);
   setTimeout(() => { nodes.forEach(n => { try { n.stop(); } catch (e) {} }); master.disconnect(); }, 1700);
 }
+// ---------- breath cues: rising air on the inhale, falling air with an Om hum on the exhale, a soft tap on each hold ----------
+let breathVoices = [], noiseBuf = null;
+function noise(ac) {
+  if (!noiseBuf) {
+    const len = ac.sampleRate * 2; noiseBuf = ac.createBuffer(1, len, ac.sampleRate);
+    const d = noiseBuf.getChannelData(0); let b0 = 0, b1 = 0, b2 = 0;
+    for (let i = 0; i < len; i++) { const w = Math.random() * 2 - 1; b0 = 0.997 * b0 + w * 0.029; b1 = 0.985 * b1 + w * 0.032; b2 = 0.95 * b2 + w * 0.048; d[i] = (b0 + b1 + b2 + w * 0.02) * 1.6; }
+  }
+  const src = ac.createBufferSource(); src.buffer = noiseBuf; src.loop = true; return src;
+}
+function breathSound(kind, dur) {
+  if (!soundOn) return;
+  try {
+    const ac = audio(); if (!ac) return;
+    const t = ac.currentTime, end = t + dur, out = ac.createGain(); out.gain.value = 1; out.connect(ac.destination);
+    const voice = { out, nodes: [] };
+    if (kind === "tap") {
+      const o = ac.createOscillator(); o.type = "sine"; o.frequency.value = 659.25;
+      const g = ac.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.05, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.6);
+      o.connect(g).connect(out); o.start(t); o.stop(t + 1.7); voice.nodes.push(o);
+    } else {
+      const inhale = kind === "in";
+      // air: band-passed noise sweeping up (in) or down (out), swelling then fading
+      const n = noise(ac), bp = ac.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 0.8;
+      bp.frequency.setValueAtTime(inhale ? 350 : 1300, t); bp.frequency.exponentialRampToValueAtTime(inhale ? 1400 : 300, end);
+      const g = ac.createGain(); g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(inhale ? 0.10 : 0.12, t + dur * (inhale ? 0.7 : 0.25));
+      g.gain.linearRampToValueAtTime(0, end);
+      n.connect(bp).connect(g).connect(out); n.start(t); n.stop(end + 0.1); voice.nodes.push(n);
+      if (!inhale) {
+        // Om: a low C with soft overtones through a mouth-like filter that closes from "oh" to "mm"
+        const f = ac.createBiquadFilter(); f.type = "lowpass"; f.Q.value = 4;
+        f.frequency.setValueAtTime(900, t); f.frequency.linearRampToValueAtTime(700, t + dur * 0.5); f.frequency.exponentialRampToValueAtTime(260, end);
+        const hg = ac.createGain(); hg.gain.setValueAtTime(0, t); hg.gain.linearRampToValueAtTime(0.16, t + 0.8);
+        hg.gain.setValueAtTime(0.16, end - 1.2); hg.gain.linearRampToValueAtTime(0, end);
+        f.connect(hg).connect(out);
+        [[130.81, "sawtooth", 0.35], [130.81, "sine", 0.6], [261.63, "sine", 0.18]].forEach(([fr, type, v], i) => {
+          const o = ac.createOscillator(); o.type = type; o.frequency.value = fr; o.detune.value = i ? 3 : -3;
+          const vg = ac.createGain(); vg.gain.value = v; o.connect(vg).connect(f); o.start(t); o.stop(end + 0.1); voice.nodes.push(o);
+        });
+      } else {
+        // a faint rising tone under the inhale so it reads as "filling up"
+        const o = ac.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(220, t); o.frequency.linearRampToValueAtTime(330, end);
+        const og = ac.createGain(); og.gain.setValueAtTime(0, t); og.gain.linearRampToValueAtTime(0.035, t + dur * 0.7); og.gain.linearRampToValueAtTime(0, end);
+        o.connect(og).connect(out); o.start(t); o.stop(end + 0.1); voice.nodes.push(o);
+      }
+    }
+    breathVoices.push(voice);
+    setTimeout(() => { breathVoices = breathVoices.filter(v => v !== voice); out.disconnect(); }, (dur + 0.5) * 1000);
+  } catch (e) {}
+}
+function stopBreathSounds() {
+  if (!actx) return;
+  const t = actx.currentTime;
+  breathVoices.forEach(v => { v.out.gain.cancelScheduledValues(t); v.out.gain.setValueAtTime(v.out.gain.value, t); v.out.gain.linearRampToValueAtTime(0, t + 0.4); });
+  breathVoices = [];
+}
+
 function chime() {
   if (!soundOn || !actx) return;
   try {
@@ -530,11 +588,18 @@ function renderRitual() {
           <span class="phase" id="phase">Ready</span>
           <span class="num" id="bnum">4 rounds · 6 seconds each side</span>
           <span class="sub" id="bsub">In for six. Hold for six. Out for six. Hold for six. Hum on the exhale.</span>
-          <div><button class="btn" id="bstart" style="margin-top:8px">Begin breathing</button></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn" id="bstart">Begin breathing</button><button class="chip sound" id="bsound" aria-pressed="${soundOn}">${soundOn ? "Breath sounds on" : "Breath sounds off"}</button></div>
         </div>
       </div>
       ${controls}`;
     stage.querySelector("#bstart").onclick = startBreath;
+    const bs = stage.querySelector("#bsound");
+    bs.onclick = () => {
+      soundOn = !soundOn;
+      try { localStorage.setItem(LS + "-sound", soundOn ? "on" : "off"); } catch (e) {}
+      bs.setAttribute("aria-pressed", soundOn); bs.textContent = soundOn ? "Breath sounds on" : "Breath sounds off";
+      if (soundOn) audio(); else stopBreathSounds();
+    };
   } else if (step.t === "lines") {
     stage.innerHTML = `${head}<p class="affirm">${s.lines.map(l => `<span>${esc(l)}</span>`).join("")}</p>${controls}`;
   } else if (step.t === "blessings") {
@@ -597,12 +662,13 @@ function startBreath() {
   const subs = ["Slowly, through the nose.", "Stay soft.", "Ohhhmmm.", "Everything will be okay."];
   const SIDE = 6, TOTAL = SIDE * 4 * 4; let t = 0;
   const tick = () => {
-    if (t >= TOTAL) { clearInterval(breathTimer); phase.textContent = "Arrived"; sub.textContent = "Everything will be okay."; num.textContent = "4 rounds complete"; return; }
+    if (t >= TOTAL) { clearInterval(breathTimer); chime(); phase.textContent = "Arrived"; sub.textContent = "Everything will be okay."; num.textContent = "4 rounds complete"; return; }
     const side = Math.floor(t / SIDE) % 4, within = t % SIDE, round = Math.floor(t / (SIDE * 4)) + 1;
     const f = (within + 1) / SIDE, a = C[side], b = C[side + 1];
     orb.setAttribute("cx", a[0] + (b[0] - a[0]) * f); orb.setAttribute("cy", a[1] + (b[1] - a[1]) * f);
     trail.setAttribute("stroke-dashoffset", 560 - (side + f) * 140);
     phase.textContent = names[side]; sub.textContent = subs[side];
+    if (within === 0) breathSound(side === 0 ? "in" : side === 2 ? "out" : "tap", SIDE);
     num.textContent = `Round ${round} of 4 · ${SIDE - within}`;
     t++;
   };
