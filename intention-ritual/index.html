@@ -483,10 +483,41 @@ function stopTimers() { clearInterval(breathTimer); clearInterval(pauseTimer); b
 // ---------- pause ambience: a slow-swelling D major pad over a soft wave of brown noise, made live in the browser ----------
 let actx = null, amb = null;
 let soundOn = (() => { try { return localStorage.getItem(LS + "-sound") !== "off"; } catch (e) { return true; } })();
+let bus = null, silentEl = null;
+const SILENT_WAV = "data:audio/wav;base64,UklGRvQHAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YdAHAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==";
 function audio() {
-  if (!actx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; actx = new AC(); }
-  if (actx.state === "suspended") actx.resume().catch(() => {});
+  if (!actx) {
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null;
+    try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
+    actx = new AC();
+    // every sound goes through one bus with a gentle limiter, so levels can sit high without clipping
+    const lim = actx.createDynamicsCompressor();
+    lim.threshold.value = -10; lim.knee.value = 8; lim.ratio.value = 6; lim.attack.value = 0.01; lim.release.value = 0.3;
+    bus = actx.createGain(); bus.gain.value = 1.4; bus.connect(lim).connect(actx.destination);
+  }
+  if (actx.state !== "running") actx.resume().catch(() => {});
   return actx;
+}
+// Runs on every tap until audio is unlocked: resumes the context inside the gesture, plays a one-sample blip
+// (iOS needs a sound started in the gesture) and loops silent media so the iPhone silent switch doesn't mute it.
+function unlockAudio() {
+  if (!soundOn) return;
+  const ac = audio(); if (!ac) return;
+  try { const b = ac.createBuffer(1, 1, ac.sampleRate), src = ac.createBufferSource(); src.buffer = b; src.connect(ac.destination); src.start(0); } catch (e) {}
+  try {
+    if (!silentEl) { silentEl = new Audio(SILENT_WAV); silentEl.loop = true; silentEl.setAttribute("playsinline", ""); silentEl.volume = 0.01; }
+    if (silentEl.paused) silentEl.play().catch(() => {});
+  } catch (e) {}
+}
+["pointerdown", "touchend", "keydown"].forEach(ev => document.addEventListener(ev, unlockAudio, { capture: true, passive: true }));
+function testSound() {
+  unlockAudio(); const ac = actx; if (!ac) return;
+  const t = ac.currentTime;
+  [[523.25, 0], [659.25, 0.18], [783.99, 0.36]].forEach(([f, d]) => {
+    const o = ac.createOscillator(); o.type = "sine"; o.frequency.value = f;
+    const g = ac.createGain(); g.gain.setValueAtTime(0, t + d); g.gain.linearRampToValueAtTime(0.35, t + d + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + d + 1.4);
+    o.connect(g).connect(bus); o.start(t + d); o.stop(t + d + 1.5);
+  });
 }
 function startAmbient() {
   if (!soundOn || amb) return;
@@ -494,14 +525,14 @@ function startAmbient() {
     const ac = audio(); if (!ac) return;
     const t = ac.currentTime, nodes = [];
     const master = ac.createGain();
-    master.gain.setValueAtTime(0, t); master.gain.linearRampToValueAtTime(0.5, t + 3);
-    master.connect(ac.destination);
-    const warm = ac.createBiquadFilter(); warm.type = "lowpass"; warm.frequency.value = 900; warm.connect(master);
-    [146.83, 220, 293.66, 369.99].forEach((f, i) => [-5, 5].forEach(d => {
+    master.gain.setValueAtTime(0, t); master.gain.linearRampToValueAtTime(0.9, t + 3);
+    master.connect(bus);
+    const warm = ac.createBiquadFilter(); warm.type = "lowpass"; warm.frequency.value = 2600; warm.connect(master);
+    [293.66, 440, 587.33, 739.99].forEach((f, i) => [-5, 5].forEach(d => {
       const o = ac.createOscillator(); o.type = i < 2 ? "sine" : "triangle"; o.frequency.value = f; o.detune.value = d;
-      const g = ac.createGain(); g.gain.value = 0.045;
+      const g = ac.createGain(); g.gain.value = 0.07;
       const lfo = ac.createOscillator(); lfo.frequency.value = 0.04 + i * 0.017;
-      const depth = ac.createGain(); depth.gain.value = 0.03;
+      const depth = ac.createGain(); depth.gain.value = 0.04;
       lfo.connect(depth).connect(g.gain); o.connect(g).connect(warm);
       o.start(t); lfo.start(t); nodes.push(o, lfo);
     }));
@@ -509,10 +540,10 @@ function startAmbient() {
     let last = 0;
     for (let i = 0; i < len; i++) { last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02; data[i] = last * 3.5; }
     const noise = ac.createBufferSource(); noise.buffer = buf; noise.loop = true;
-    const nf = ac.createBiquadFilter(); nf.type = "lowpass"; nf.frequency.value = 480;
-    const ng = ac.createGain(); ng.gain.value = 0.16;
+    const nf = ac.createBiquadFilter(); nf.type = "bandpass"; nf.frequency.value = 900; nf.Q.value = 0.5;
+    const ng = ac.createGain(); ng.gain.value = 0.5;
     const wave = ac.createOscillator(); wave.frequency.value = 0.09;
-    const wd = ac.createGain(); wd.gain.value = 0.11;
+    const wd = ac.createGain(); wd.gain.value = 0.35;
     wave.connect(wd).connect(ng.gain); noise.connect(nf).connect(ng).connect(master);
     noise.start(t); wave.start(t); nodes.push(noise, wave);
     amb = { master, nodes };
@@ -539,36 +570,36 @@ function breathSound(kind, dur) {
   if (!soundOn) return;
   try {
     const ac = audio(); if (!ac) return;
-    const t = ac.currentTime, end = t + dur, out = ac.createGain(); out.gain.value = 1; out.connect(ac.destination);
+    const t = ac.currentTime, end = t + dur, out = ac.createGain(); out.gain.value = 1; out.connect(bus);
     const voice = { out, nodes: [] };
     if (kind === "tap") {
       const o = ac.createOscillator(); o.type = "sine"; o.frequency.value = 659.25;
-      const g = ac.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.05, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.6);
+      const g = ac.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.2, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.6);
       o.connect(g).connect(out); o.start(t); o.stop(t + 1.7); voice.nodes.push(o);
     } else {
       const inhale = kind === "in";
       // air: band-passed noise sweeping up (in) or down (out), swelling then fading
       const n = noise(ac), bp = ac.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 0.8;
-      bp.frequency.setValueAtTime(inhale ? 350 : 1300, t); bp.frequency.exponentialRampToValueAtTime(inhale ? 1400 : 300, end);
+      bp.frequency.setValueAtTime(inhale ? 600 : 2400, t); bp.frequency.exponentialRampToValueAtTime(inhale ? 2600 : 550, end);
       const g = ac.createGain(); g.gain.setValueAtTime(0, t);
-      g.gain.linearRampToValueAtTime(inhale ? 0.10 : 0.12, t + dur * (inhale ? 0.7 : 0.25));
+      g.gain.linearRampToValueAtTime(inhale ? 0.55 : 0.45, t + dur * (inhale ? 0.7 : 0.25));
       g.gain.linearRampToValueAtTime(0, end);
       n.connect(bp).connect(g).connect(out); n.start(t); n.stop(end + 0.1); voice.nodes.push(n);
       if (!inhale) {
-        // Om: a low C with soft overtones through a mouth-like filter that closes from "oh" to "mm"
+        // Om: a G3 hum with soft overtones through a mouth-like filter that closes from "oh" to "mm"
         const f = ac.createBiquadFilter(); f.type = "lowpass"; f.Q.value = 4;
-        f.frequency.setValueAtTime(900, t); f.frequency.linearRampToValueAtTime(700, t + dur * 0.5); f.frequency.exponentialRampToValueAtTime(260, end);
-        const hg = ac.createGain(); hg.gain.setValueAtTime(0, t); hg.gain.linearRampToValueAtTime(0.16, t + 0.8);
-        hg.gain.setValueAtTime(0.16, end - 1.2); hg.gain.linearRampToValueAtTime(0, end);
+        f.frequency.setValueAtTime(1800, t); f.frequency.linearRampToValueAtTime(1300, t + dur * 0.5); f.frequency.exponentialRampToValueAtTime(600, end);
+        const hg = ac.createGain(); hg.gain.setValueAtTime(0, t); hg.gain.linearRampToValueAtTime(0.3, t + 0.8);
+        hg.gain.setValueAtTime(0.3, end - 1.2); hg.gain.linearRampToValueAtTime(0, end);
         f.connect(hg).connect(out);
-        [[130.81, "sawtooth", 0.35], [130.81, "sine", 0.6], [261.63, "sine", 0.18]].forEach(([fr, type, v], i) => {
+        [[196, "sawtooth", 0.35], [196, "sine", 0.5], [392, "sine", 0.3], [588, "sine", 0.12]].forEach(([fr, type, v], i) => {
           const o = ac.createOscillator(); o.type = type; o.frequency.value = fr; o.detune.value = i ? 3 : -3;
           const vg = ac.createGain(); vg.gain.value = v; o.connect(vg).connect(f); o.start(t); o.stop(end + 0.1); voice.nodes.push(o);
         });
       } else {
         // a faint rising tone under the inhale so it reads as "filling up"
-        const o = ac.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(220, t); o.frequency.linearRampToValueAtTime(330, end);
-        const og = ac.createGain(); og.gain.setValueAtTime(0, t); og.gain.linearRampToValueAtTime(0.035, t + dur * 0.7); og.gain.linearRampToValueAtTime(0, end);
+        const o = ac.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(330, t); o.frequency.linearRampToValueAtTime(495, end);
+        const og = ac.createGain(); og.gain.setValueAtTime(0, t); og.gain.linearRampToValueAtTime(0.08, t + dur * 0.7); og.gain.linearRampToValueAtTime(0, end);
         o.connect(og).connect(out); o.start(t); o.stop(end + 0.1); voice.nodes.push(o);
       }
     }
@@ -587,10 +618,10 @@ function chime() {
   if (!soundOn || !actx) return;
   try {
     const t = actx.currentTime;
-    [[587.33, 0.12], [880, 0.07], [1174.66, 0.04]].forEach(([f, v]) => {
+    [[587.33, 0.3], [880, 0.18], [1174.66, 0.1]].forEach(([f, v]) => {
       const o = actx.createOscillator(); o.type = "sine"; o.frequency.value = f;
       const g = actx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 4);
-      o.connect(g).connect(actx.destination); o.start(t); o.stop(t + 4.1);
+      o.connect(g).connect(bus); o.start(t); o.stop(t + 4.1);
     });
   } catch (e) {}
 }
@@ -651,7 +682,7 @@ function renderRitual() {
           <span class="phase" id="phase">Ready</span>
           <span class="num" id="bnum">4 rounds · 6 seconds each side</span>
           <span class="sub" id="bsub">In for six. Hold for six. Out for six. Hold for six. Hum on the exhale.</span>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn" id="bstart">Begin breathing</button><button class="chip sound" id="bsound" aria-pressed="${soundOn}">${soundOn ? "Breath sounds on" : "Breath sounds off"}</button></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn" id="bstart">Begin breathing</button><button class="chip sound" id="bsound" aria-pressed="${soundOn}">${soundOn ? "Breath sounds on" : "Breath sounds off"}</button><button class="chip" data-test>Test sound</button></div>
         </div>
       </div>
       ${controls}`;
@@ -684,7 +715,8 @@ function renderRitual() {
         <span class="eyebrow">Pause</span>
         <svg class="ring" viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--path)" stroke-width="6"/><circle id="pring" cx="60" cy="60" r="52" fill="none" stroke="var(--glow)" stroke-width="6" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" transform="rotate(-90 60 60)"/><text id="ptext" x="60" y="66" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="18" fill="var(--ink)">30</text></svg>
         <p>${esc(s.pause)}</p>
-        <button class="chip sound" id="sound" aria-pressed="${soundOn}">${soundOn ? "Calming sound on" : "Calming sound off"}</button>
+        <span class="row"><button class="chip sound" id="sound" aria-pressed="${soundOn}">${soundOn ? "Calming sound on" : "Calming sound off"}</button><button class="chip" data-test>Test sound</button></span>
+        <span class="store-note">No sound? Turn your volume up. On iPhone, also check the silent switch.</span>
       </div>
       ${controls}`;
     let t = 0; const ring = stage.querySelector("#pring"), tx = stage.querySelector("#ptext");
@@ -699,6 +731,7 @@ function renderRitual() {
     };
   }
 
+  stage.querySelectorAll("[data-test]").forEach(b => b.onclick = testSound);
   stage.querySelector("#prev").onclick = () => {
     if (cur.step > 0) cur.step--; else if (cur.s > 0) { cur.s--; cur.step = stepsFor(SECTIONS[cur.s]).length - 1; }
     renderRitual(); renderHeader();
