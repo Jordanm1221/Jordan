@@ -153,6 +153,65 @@ textarea:focus { outline: 2px solid var(--glow); outline-offset: 0; border-color
 .mode button[aria-pressed="true"] { background: var(--glow); color: var(--on-glow); }
 .store-note { font-size: 12.5px; color: var(--muted); }
 
+/* Vision work */
+.vlayout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 28px; align-items: start; }
+.vlist { display: grid; gap: 6px; }
+.vlist .vw { text-align: left; background: none; border: 1px solid transparent; border-radius: 10px; padding: 9px 12px; display: grid; gap: 2px; }
+.vlist .vw[aria-current="true"] { background: var(--surface); border-color: var(--line); }
+.vlist .vw b { font-weight: 700; font-size: 14.5px; }
+.vlist .vw span { font-family: var(--f-mono); font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+.vnew { display: grid; gap: 8px; padding-top: 10px; border-top: 1px solid var(--line); margin-top: 6px; }
+.vsteps { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px; }
+.vsteps button { flex: 1 0 auto; background: none; border: 0; border-top: 3px solid var(--path); padding: 8px 6px 0; text-align: left; font-size: 12.5px; color: var(--muted); }
+.vsteps button.past { border-top-color: var(--glow); }
+.vsteps button[aria-current="step"] { border-top-color: var(--glow); color: var(--ink); font-weight: 700; }
+.vsteps button i { font-style: normal; font-family: var(--f-mono); font-size: 11px; display: block; }
+input.field { width: 100%; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font: 16px/1.4 var(--f-body); padding: 10px 14px; min-width: 0; }
+input.field:focus { outline: 2px solid var(--glow); outline-offset: 0; border-color: transparent; }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.row > input.field { flex: 1 1 220px; }
+.guide { color: var(--muted); margin: 0; max-width: 62ch; }
+.ladder { display: grid; gap: 0; }
+.rung { display: grid; gap: 2px; padding: 10px 14px 10px 18px; border-left: 2px solid var(--glow); position: relative; }
+.rung::before { content: ""; position: absolute; left: -6px; top: 16px; width: 10px; height: 10px; border-radius: 50%; background: var(--glow); }
+.rung .q { color: var(--muted); font-size: 13.5px; }
+.rung .a { font-weight: 700; display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.rung .a button { background: none; border: 0; color: var(--muted); font-size: 13px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.vchip { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 8px 6px 14px; font-size: 14px; }
+.vchip button { background: none; border: 0; color: var(--muted); padding: 0 4px; }
+.vchip.n b { font-family: var(--f-mono); font-size: 12px; color: var(--accent); }
+.duel { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.duel button { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 28px 18px; font-family: var(--f-display); font-size: clamp(20px, 3vw, 28px); line-height: 1.2; overflow-wrap: anywhere; }
+.duel button:hover { border-color: var(--glow); background: var(--glow-soft); }
+.ranked { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; counter-reset: r; }
+.ranked li { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 10px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; counter-increment: r; }
+.ranked li::before { content: counter(r); font-family: var(--f-mono); color: var(--accent); text-align: center; }
+.ranked li span { overflow-wrap: anywhere; }
+.ranked li button { background: none; border: 1px solid var(--line); border-radius: 6px; width: 28px; height: 26px; color: var(--muted); }
+.seen { display: grid; gap: 6px; }
+.seen button { text-align: left; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; }
+.seen button .box { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--path); }
+.seen button[aria-pressed="true"] { border-color: var(--glow); }
+.seen button[aria-pressed="true"] .box { background: var(--glow); border-color: var(--glow); }
+.form { display: grid; gap: 14px; }
+.form label { display: grid; gap: 6px; }
+.form .lab { font-size: 14px; color: var(--muted); }
+.form .lab b { color: var(--ink); }
+.callout { background: var(--glow-soft); border-radius: 12px; padding: 12px 16px; margin: 0; }
+.visiontext { font-family: var(--f-display); font-size: clamp(20px, 2.6vw, 26px); line-height: 1.45; margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.dots { display: flex; gap: 10px; }
+.dots span { display: grid; justify-items: center; gap: 4px; font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+.dots i { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--path); }
+.dots i.on { background: var(--glow); border-color: var(--glow); box-shadow: 0 0 12px var(--glow); }
+.banner { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; text-align: left; width: 100%; background: var(--glow-soft); border: 1px solid var(--glow); border-radius: var(--r); padding: 14px 18px; margin-bottom: 14px; }
+.credit { font-size: 12px; color: var(--muted); }
+@media (max-width: 760px) {
+  .vlayout { grid-template-columns: minmax(0, 1fr); }
+  .duel { grid-template-columns: minmax(0, 1fr); }
+}
+.chip[aria-pressed="true"] { border-color: var(--glow); color: var(--ink); background: var(--glow-soft); }
+
 @media (max-width: 760px) {
   .ritual, .wall { grid-template-columns: minmax(0, 1fr); }
   .steps { position: static; display: flex; overflow-x: auto; gap: 4px; padding-bottom: 4px; }
@@ -187,11 +246,13 @@ textarea:focus { outline: 2px solid var(--glow); outline-offset: 0; border-color
     <button class="tab" role="tab" id="tab-board" data-view="board" aria-selected="true">Board</button>
     <button class="tab" role="tab" id="tab-ritual" data-view="ritual" aria-selected="false">Walk the ritual</button>
     <button class="tab" role="tab" id="tab-wall" data-view="wall" aria-selected="false">Evidence wall</button>
+    <button class="tab" role="tab" id="tab-vision" data-view="vision" aria-selected="false">Vision</button>
   </nav>
 
   <section id="view-board"></section>
   <section id="view-ritual" hidden></section>
   <section id="view-wall" hidden></section>
+  <section id="view-vision" hidden></section>
   <p class="store-note" id="store-note">Your answers are saved in this browser.</p>
 </div>
 
@@ -381,8 +442,10 @@ function streak() {
 function renderBoard() {
   const el = document.getElementById("view-board");
   const hour = new Date().getHours();
-  el.innerHTML = `<div class="board"></div>`;
-  const grid = el.firstChild;
+  const due = visionDue();
+  el.innerHTML = due.map(w => `<button class="banner" data-vid="${w.id}"><span><span class="eyebrow">Revisit today · day ${w.revisits.length + 1} of 3</span><br><b>${esc(w.goal)}</b></span><span class="btn primary">Open my vision</span></button>`).join("") + `<div class="board"></div>`;
+  el.querySelectorAll("[data-vid]").forEach(b => b.onclick = () => { vstore.active = b.dataset.vid; setView("vision"); });
+  const grid = el.querySelector(".board");
   SECTIONS.forEach((s, i) => {
     const a = answeredIn(days[todayKey], s);
     const st = sectionState(s);
@@ -706,14 +769,294 @@ function renderWall() {
   el.querySelectorAll(".bar").forEach(b => b.onclick = () => { wallFilter = wallFilter === b.dataset.id ? null : b.dataset.id; renderWall(); });
 }
 
+// ---------- vision work: values → rank → vision → resistance → integrate → revisit ----------
+const VSTAGES = [["values", "Values"], ["rank", "Rank"], ["vision", "Vision"], ["resist", "Resistance"], ["integrate", "Integrate"], ["revisit", "Revisit"]];
+const VSUGGEST = ["Faith and trust", "Laura and our family", "Health and body", "Who I am becoming", "Work and creativity", "Wealth and abundance"];
+const LSV = LS + "-vision";
+let vstore = (() => { try { return JSON.parse(localStorage.getItem(LSV)) || null; } catch (e) { return null; } })() || { works: {}, order: [], active: null };
+let vRemote = null, vDirty = false, vSaving = false, vSaveT = null;
+let qMode = "do", rankRun = null, holdT = null;
+
+function W() { return vstore.works[vstore.active] || null; }
+function saveV() {
+  try { localStorage.setItem(LSV, JSON.stringify(vstore)); } catch (e) {}
+  vDirty = true; clearTimeout(vSaveT); vSaveT = setTimeout(flushV, 900);
+}
+async function flushV() {
+  if (!vDirty) return;
+  if (!vRemote) { vDirty = false; return; }
+  if (vSaving) { vSaveT = setTimeout(flushV, 600); return; }
+  vSaving = true; vDirty = false;
+  try { await vRemote.set(JSON.parse(JSON.stringify(vstore))); } catch (e) {}
+  vSaving = false;
+  if (vDirty) flushV();
+}
+function newWork(goal) {
+  const id = "w" + Date.now().toString(36);
+  vstore.works[id] = { id, goal: goal.trim(), created: todayKey, stage: "values", chain: [], values: [], ranked: [], vision: "", seen: {}, rounds: [], revisits: [], released: null };
+  vstore.order.unshift(id); vstore.active = id; qMode = "do"; rankRun = null;
+  saveV(); renderVision();
+}
+function setStage(st) { const w = W(); if (!w) return; w.stage = st; rankRun = null; saveV(); renderVision(); window.scrollTo({ top: document.querySelector("nav.tabs").offsetTop - 12, behavior: "smooth" }); }
+const same = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
+function roundValues(r) { return [r.a2, r.a3, r.a4].concat(r.extra || []).map(v => (v || "").trim()).filter(Boolean); }
+
+function stopHold() { if (holdT) { clearInterval(holdT); holdT = null; stopAmbient(); } }
+function hold(btn, secs, doneLabel) {
+  if (holdT) { stopHold(); btn.textContent = doneLabel; return; }
+  let left = secs; startAmbient();
+  const show = () => btn.textContent = `Sitting quietly · ${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")} · tap to stop`;
+  show();
+  holdT = setInterval(() => { left--; show(); if (left <= 0) { stopHold(); chime(); btn.textContent = doneLabel; } }, 1000);
+}
+
+// pairwise ranking by binary insertion; the person picks between two values each time
+function* rankGen(vals) {
+  const out = [];
+  for (const v of vals) {
+    let lo = 0, hi = out.length;
+    while (lo < hi) { const mid = (lo + hi) >> 1; const pick = yield [v, out[mid]]; if (pick === v) hi = mid; else lo = mid + 1; }
+    out.splice(lo, 0, v);
+  }
+  return out;
+}
+function stepRank(pick) {
+  const r = rankRun.gen.next(pick);
+  if (r.done) { W().ranked = r.value; rankRun = null; saveV(); }
+  else { rankRun.pair = r.value; rankRun.n++; }
+  renderVision();
+}
+
+function renderVision() {
+  stopHold();
+  const el = document.getElementById("view-vision");
+  const w = W();
+  const list = vstore.order.filter(id => vstore.works[id]).map(id => {
+    const x = vstore.works[id];
+    const st = x.released ? "Let go" : VSTAGES.find(s => s[0] === x.stage)[1];
+    return `<button class="vw" data-id="${id}" aria-current="${id === vstore.active}"><b>${esc(x.goal)}</b><span>${st}</span></button>`;
+  }).join("");
+  el.innerHTML = `
+    <div class="vlayout">
+      <aside class="vlist">
+        <span class="eyebrow">My visions</span>
+        ${list || `<span class="store-note">None yet.</span>`}
+        <div class="vnew">
+          <label class="eyebrow" for="v-new">Start a new vision</label>
+          <input class="field" id="v-new" placeholder="A goal or area of life">
+          <button class="btn" id="v-newbtn">Start</button>
+        </div>
+      </aside>
+      <div class="stage" id="vstage"></div>
+    </div>`;
+  el.querySelectorAll(".vw").forEach(b => b.onclick = () => { vstore.active = b.dataset.id; rankRun = null; qMode = "do"; saveV(); renderVision(); });
+  const nv = el.querySelector("#v-new");
+  const start = () => { if (nv.value.trim()) newWork(nv.value); };
+  el.querySelector("#v-newbtn").onclick = start;
+  nv.onkeydown = e => { if (e.key === "Enter") start(); };
+  const stage = el.querySelector("#vstage");
+
+  if (!w) {
+    stage.innerHTML = `
+      <span class="eyebrow">Values, vision and resistance</span>
+      <h2 style="font-size:clamp(26px,3.6vw,34px)">Build a vision from what you truly value</h2>
+      <p class="guide">Pick a goal or an area of life. You will draw out the values underneath it, rank them, see them all in one vision, then clear whatever resists it. Afterwards you revisit the vision for a few minutes a day for 2 to 3 days, then let it go.</p>
+      <div class="chips">${VSUGGEST.map(s => `<button class="chip" data-s="${esc(s)}">${esc(s)}</button>`).join("")}</div>
+      <p class="credit">Adapted from the SelfConcept.com values and vision worksheets.</p>`;
+    stage.querySelectorAll("[data-s]").forEach(b => b.onclick = () => newWork(b.dataset.s));
+    return;
+  }
+
+  const si = VSTAGES.findIndex(s => s[0] === w.stage);
+  const steps = `<nav class="vsteps" aria-label="Steps">${VSTAGES.map(([k, l], i) => `<button data-st="${k}" class="${i < si ? "past" : ""}" ${i === si ? 'aria-current="step"' : ""}><i>${i + 1}</i>${l}</button>`).join("")}</nav>`;
+  const head = `${steps}<div style="display:grid;gap:4px"><span class="eyebrow">Vision for</span><h2 style="font-size:clamp(24px,3.4vw,32px)">${esc(w.goal)}</h2></div>`;
+  const vals = w.ranked.length ? w.ranked : w.values;
+
+  if (w.stage === "values") {
+    const last = w.chain.length ? w.chain[w.chain.length - 1].a : w.goal;
+    const q = qMode === "do" ? `What will having ${last} do for you?` : "What's important to you about that?";
+    stage.innerHTML = `${head}
+      <p class="guide">Answer the question, then keep asking. Each answer is a value. Stop when you run out of values or find yourself cycling back to earlier ones.</p>
+      ${w.chain.length ? `<div class="ladder">${w.chain.map((c, i) => `<div class="rung"><span class="q">${esc(c.q)}</span><span class="a">It will give me ${esc(c.a)}<button data-del="${i}" aria-label="Remove">✕</button></span></div>`).join("")}</div>` : ""}
+      <p class="question" style="max-width:none">${esc(q)}</p>
+      <div class="row"><button class="chip" id="q-do" aria-pressed="${qMode === "do"}">What will that do for you?</button><button class="chip" id="q-imp" aria-pressed="${qMode === "imp"}">What's important to you about that?</button></div>
+      <div class="row"><input class="field" id="v-ans" placeholder="It will give me…"><button class="btn primary" id="v-add">Add</button></div>
+      <div style="display:grid;gap:8px"><span class="eyebrow">Your values · ${w.values.length}</span>
+        <div class="chips">${w.values.map((v, i) => `<span class="vchip">${esc(v)}<button data-rm="${i}" aria-label="Remove ${esc(v)}">✕</button></span>`).join("") || `<span class="store-note">Your answers will collect here.</span>`}</div>
+        <div class="row"><input class="field" id="v-extra" placeholder="Add a value by hand"><button class="btn" id="v-extrabtn">Add value</button></div>
+      </div>
+      <div class="controls"><span></span><button class="btn primary" id="v-next" ${w.values.length < 2 ? "disabled" : ""}>I'm cycling back. Rank my values</button></div>`;
+    const ans = stage.querySelector("#v-ans");
+    const add = () => {
+      const a = ans.value.trim(); if (!a) return;
+      w.chain.push({ q, a });
+      if (!w.values.some(v => same(v, a))) w.values.push(a);
+      saveV(); renderVision(); document.getElementById("v-ans")?.focus();
+    };
+    stage.querySelector("#v-add").onclick = add; ans.onkeydown = e => { if (e.key === "Enter") add(); };
+    stage.querySelector("#q-do").onclick = () => { qMode = "do"; renderVision(); };
+    stage.querySelector("#q-imp").onclick = () => { qMode = "imp"; renderVision(); };
+    stage.querySelectorAll("[data-del]").forEach(b => b.onclick = () => { w.chain.splice(+b.dataset.del, 1); saveV(); renderVision(); });
+    stage.querySelectorAll("[data-rm]").forEach(b => b.onclick = () => { w.values.splice(+b.dataset.rm, 1); saveV(); renderVision(); });
+    const ex = stage.querySelector("#v-extra");
+    const addEx = () => { const a = ex.value.trim(); if (a && !w.values.some(v => same(v, a))) { w.values.push(a); saveV(); } renderVision(); };
+    stage.querySelector("#v-extrabtn").onclick = addEx; ex.onkeydown = e => { if (e.key === "Enter") addEx(); };
+    stage.querySelector("#v-next").onclick = () => setStage("rank");
+  }
+
+  else if (w.stage === "rank") {
+    const stale = w.ranked.length && (w.ranked.length !== w.values.length || w.values.some(v => !w.ranked.includes(v)));
+    if (rankRun) {
+      const [a, b] = rankRun.pair;
+      stage.innerHTML = `${head}
+        <p class="question" style="max-width:none">In the context of ${esc(w.goal.toLowerCase())}, if you could only have one, which would you choose?</p>
+        <p class="guide">Choose the value that, once you have it, means the other is already fulfilled. Don't rank in order of what comes first.</p>
+        <div class="duel"><button data-p="a">${esc(a)}</button><button data-p="b">${esc(b)}</button></div>
+        <div class="controls"><span class="count">Comparison ${rankRun.n}</span><button class="btn" id="r-stop">Stop ranking</button></div>`;
+      stage.querySelector('[data-p="a"]').onclick = () => stepRank(a);
+      stage.querySelector('[data-p="b"]').onclick = () => stepRank(b);
+      stage.querySelector("#r-stop").onclick = () => { rankRun = null; renderVision(); };
+    } else {
+      stage.innerHTML = `${head}
+        <p class="guide">You'll see your values two at a time and pick one. When you're done they're in order, most important first. You can still nudge them with the arrows.</p>
+        ${w.ranked.length ? `<ol class="ranked">${w.ranked.map((v, i) => `<li><span>${esc(v)}</span><span style="display:flex;gap:4px"><button data-up="${i}" aria-label="Move up" ${i === 0 ? "disabled" : ""}>↑</button><button data-dn="${i}" aria-label="Move down" ${i === w.ranked.length - 1 ? "disabled" : ""}>↓</button></span></li>`).join("")}</ol>` : `<div class="chips">${w.values.map(v => `<span class="vchip" style="padding-right:14px">${esc(v)}</span>`).join("")}</div>`}
+        ${stale ? `<p class="callout">Your values changed since you ranked them. Rank again to include every value.</p>` : ""}
+        <div class="controls"><button class="btn" id="r-back">Back to values</button>
+          <span class="row"><button class="btn ${w.ranked.length && !stale ? "" : "primary"}" id="r-go">${w.ranked.length ? "Rank again" : "Start ranking"}</button>
+          ${w.ranked.length && !stale ? `<button class="btn primary" id="r-next">Create my vision</button>` : ""}</span></div>`;
+      stage.querySelector("#r-go").onclick = () => {
+        rankRun = { gen: rankGen(w.values.slice()), n: 0 };
+        const r = rankRun.gen.next();
+        if (r.done) { w.ranked = r.value; rankRun = null; saveV(); } else { rankRun.pair = r.value; rankRun.n = 1; }
+        renderVision();
+      };
+      stage.querySelector("#r-back").onclick = () => setStage("values");
+      stage.querySelector("#r-next")?.addEventListener("click", () => setStage("vision"));
+      const mv = (i, d) => { const r = w.ranked; [r[i], r[i + d]] = [r[i + d], r[i]]; saveV(); renderVision(); };
+      stage.querySelectorAll("[data-up]").forEach(b => b.onclick = () => mv(+b.dataset.up, -1));
+      stage.querySelectorAll("[data-dn]").forEach(b => b.onclick = () => mv(+b.dataset.dn, 1));
+    }
+  }
+
+  else if (w.stage === "vision" || w.stage === "integrate") {
+    const integ = w.stage === "integrate";
+    const rv = integ ? w.rounds.flatMap(r => [r.pos].concat(roundValues(r))).map(v => (v || "").trim()).filter(Boolean) : [];
+    const items = integ ? rv.filter((v, i) => rv.findIndex(x => same(x, v)) === i) : vals;
+    const key = v => (integ ? "r:" : "v:") + v.toLowerCase();
+    const seenN = items.filter(v => w.seen[key(v)]).length;
+    stage.innerHTML = `${head}
+      ${integ
+        ? `<p class="guide">Bring the positive intent of the resistance and every value it gave you into the vision you already created. Tick each one once you can see it there.</p>`
+        : `<p class="guide">Create a vision that holds all of these values. Keep it vague. See yourself in it, and find something in it that stands for each value. You carry this vision with you wherever you go, even when you aren't thinking about it.</p>`}
+      <div style="display:grid;gap:8px"><span class="eyebrow">${integ ? "From the resistance" : "Your ranked values"} · ${seenN} of ${items.length} seen</span>
+        <div class="seen">${items.map(v => `<button aria-pressed="${!!w.seen[key(v)]}" data-k="${esc(key(v))}"><span class="box"></span><span>${esc(v)}</span></button>`).join("") || `<span class="store-note">Nothing yet. Go back to Resistance and fill in what you found.</span>`}</div></div>
+      <label class="ev" for="v-vision"><span class="eyebrow">My vision</span>
+        <textarea id="v-vision" placeholder="I see myself…"></textarea></label>
+      <div><button class="btn" id="v-hold">Close your eyes and hold the vision for a minute</button></div>
+      ${integ
+        ? `<div class="callout" style="display:grid;gap:10px"><b>Check for resistance again.</b><span>Look at the vision now. Is there any resistance left?</span>
+            <div class="row"><button class="btn" id="i-more">There's still resistance</button><button class="btn primary" id="i-none">No resistance now</button></div></div>
+          <div class="controls"><button class="btn" id="v-back">Back to resistance</button><span></span></div>`
+        : `<div class="controls"><button class="btn" id="v-back">Back to ranking</button><button class="btn primary" id="v-next">Check for resistance</button></div>`}`;
+    const ta = stage.querySelector("#v-vision");
+    ta.value = w.vision; ta.oninput = () => { w.vision = ta.value; saveV(); };
+    stage.querySelectorAll("[data-k]").forEach(b => b.onclick = () => {
+      const k = b.dataset.k; if (w.seen[k]) delete w.seen[k]; else w.seen[k] = true; saveV(); renderVision();
+    });
+    const hb = stage.querySelector("#v-hold"); hb.onclick = () => hold(hb, 60, "Hold it again");
+    if (integ) {
+      stage.querySelector("#v-back").onclick = () => setStage("resist");
+      stage.querySelector("#i-more").onclick = () => { w.rounds.push({ neg: "", pos: "", a2: "", a3: "", a4: "", extra: [] }); setStage("resist"); };
+      stage.querySelector("#i-none").onclick = () => setStage("revisit");
+    } else {
+      stage.querySelector("#v-back").onclick = () => setStage("rank");
+      stage.querySelector("#v-next").onclick = () => { if (!w.rounds.length) w.rounds.push({ neg: "", pos: "", a2: "", a3: "", a4: "", extra: [] }); setStage("resist"); };
+    }
+  }
+
+  else if (w.stage === "resist") {
+    if (!w.rounds.length) w.rounds.push({ neg: "", pos: "", a2: "", a3: "", a4: "", extra: [] });
+    const r = w.rounds[w.rounds.length - 1];
+    const one = r.pos.trim() || "(1)", two = r.a2.trim() || "(2)";
+    stage.innerHTML = `${head}
+      <span class="eyebrow">Round ${w.rounds.length}</span>
+      ${w.vision.trim() ? `<p class="visiontext" style="font-size:18px;color:var(--muted)">${esc(w.vision)}</p>` : ""}
+      <p class="question" style="max-width:none">Is there any resistance to having the vision you now see in front of you? What stops you from having it?</p>
+      <p class="guide">Wait for your unconscious to answer. Your conscious mind will rush to fill the silence, but its answer is likely not the right one, especially if it blames something else. The real answer may come as a feeling, a voice or an image.</p>
+      <div><button class="btn" id="r-wait">Wait quietly for the answer</button></div>
+      <div class="form">
+        <label><span class="lab">Resistance stated in the negative</span><input class="field" data-f="neg" placeholder="I don't want…"></label>
+        <p class="callout">Welcome the resistance. It is a part of you with a positive intent or a message for you. It isn't trying to ruin your goals or your plans. What do you want instead of what you don't want?</p>
+        <label><span class="lab"><b>I want</b> (resistance stated in the positive) · 1</span><input class="field" data-f="pos" placeholder="I want…"></label>
+        <label><span class="lab">What will having <b id="lab1">${esc(one)}</b> do for you? <b>It will give me</b> · 2</span><input class="field" data-f="a2"></label>
+        <label><span class="lab">What will having <b id="lab2">${esc(two)}</b> do for you? <b>It will give me</b> · 3</span><input class="field" data-f="a3"></label>
+        <label><span class="lab">What's important to you about that? <b>Then I will have</b> · 4</span><input class="field" data-f="a4"></label>
+      </div>
+      <div style="display:grid;gap:8px"><span class="eyebrow">Values from resistance</span>
+        <div class="chips" id="rvals"></div>
+        <div class="row"><input class="field" id="r-extra" placeholder="Add another value from the resistance"><button class="btn" id="r-extrabtn">Add value</button></div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="r-none">There is no resistance</button>
+        <button class="btn primary" id="r-next" ${r.pos.trim() ? "" : "disabled"}>Integrate into my vision</button>
+      </div>`;
+    stage.querySelectorAll("[data-f]").forEach(inp => {
+      const f = inp.dataset.f; inp.value = r[f] || "";
+      inp.oninput = () => { r[f] = inp.value; saveV(); live(); };
+    });
+    function live() {
+      stage.querySelector("#lab1").textContent = r.pos.trim() || "(1)";
+      stage.querySelector("#lab2").textContent = r.a2.trim() || "(2)";
+      stage.querySelector("#r-next").disabled = !r.pos.trim();
+      stage.querySelector("#rvals").innerHTML = roundValues(r).map(v => `<span class="vchip" style="padding-right:14px">${esc(v)}</span>`).join("") || `<span class="store-note">Answers 2 to 4 collect here.</span>`;
+    }
+    live();
+    const wb = stage.querySelector("#r-wait"); wb.onclick = () => hold(wb, 45, "Wait again");
+    const ex = stage.querySelector("#r-extra");
+    const addEx = () => { const a = ex.value.trim(); if (a) { (r.extra = r.extra || []).push(a); saveV(); } renderVision(); };
+    stage.querySelector("#r-extrabtn").onclick = addEx; ex.onkeydown = e => { if (e.key === "Enter") addEx(); };
+    stage.querySelector("#r-none").onclick = () => {
+      if (!r.neg.trim() && !r.pos.trim() && !roundValues(r).length) w.rounds.pop();
+      setStage("revisit");
+    };
+    stage.querySelector("#r-next").onclick = () => setStage("integrate");
+  }
+
+  else if (w.stage === "revisit") {
+    const done = w.revisits.includes(todayKey);
+    stage.innerHTML = `${head}
+      ${w.released
+        ? `<p class="callout">You let this vision go on ${new Date(w.released + "T12:00").toLocaleDateString(undefined, { month: "long", day: "numeric" })}. It grows more powerful as it slips into your unconscious.</p>`
+        : `<p class="guide">No resistance left. Revisit your vision once a day for a few minutes, for 2 to 3 days. Then let it go. It becomes more powerful once it slips into your unconscious.</p>`}
+      <p class="visiontext">${esc(w.vision.trim() || "Write your vision in the Vision step first.")}</p>
+      <div class="chips">${vals.map((v, i) => `<span class="vchip n" style="padding-right:14px"><b>${w.ranked.length ? i + 1 : "·"}</b>${esc(v)}</span>`).join("")}</div>
+      ${w.released ? "" : `
+      <div class="dots">${[0, 1, 2].map(i => `<span><i class="${w.revisits[i] ? "on" : ""}"></i>${w.revisits[i] ? new Date(w.revisits[i] + "T12:00").toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "Day " + (i + 1)}</span>`).join("")}</div>
+      <div class="row"><button class="btn" id="v-hold">Hold the vision for a few minutes</button>
+        <button class="btn primary" id="v-rev" ${done || w.revisits.length >= 3 ? "disabled" : ""}>${done ? "Revisited today" : "I revisited it today"}</button></div>
+      <div class="controls"><button class="btn" id="v-res">I feel resistance again</button>
+        <button class="btn" id="v-let" ${w.revisits.length >= 2 ? "" : "disabled"}>Let it go</button></div>`}`;
+    if (!w.released) {
+      const hb = stage.querySelector("#v-hold"); hb.onclick = () => hold(hb, 180, "Hold it again");
+      stage.querySelector("#v-rev").onclick = () => { if (!w.revisits.includes(todayKey)) w.revisits.push(todayKey); saveV(); renderVision(); };
+      stage.querySelector("#v-res").onclick = () => { w.rounds.push({ neg: "", pos: "", a2: "", a3: "", a4: "", extra: [] }); setStage("resist"); };
+      stage.querySelector("#v-let").onclick = () => { w.released = todayKey; saveV(); renderVision(); };
+    }
+  }
+
+  stage.querySelectorAll(".vsteps button").forEach(b => b.onclick = () => setStage(b.dataset.st));
+}
+function visionDue() { return vstore.order.map(id => vstore.works[id]).filter(w => w && !w.released && w.stage === "revisit" && w.revisits.length < 3 && !w.revisits.includes(todayKey)); }
+
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
 
 function setView(v) {
   view = v;
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.view === v));
-  ["board", "ritual", "wall"].forEach(n => document.getElementById("view-" + n).hidden = n !== v);
+  ["board", "ritual", "wall", "vision"].forEach(n => document.getElementById("view-" + n).hidden = n !== v);
   if (v !== "ritual") stopTimers();
-  if (v === "board") renderBoard(); else if (v === "ritual") renderRitual(); else renderWall();
+  if (v !== "vision") stopHold();
+  if (v === "board") renderBoard(); else if (v === "ritual") renderRitual(); else if (v === "vision") renderVision(); else renderWall();
   renderHeader();
 }
 document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
@@ -738,20 +1081,24 @@ setView("board");
     if (!id) return;
     col = db.collection("data/users/" + id);
     remote = col.doc(todayKey);
+    vRemote = col.doc("vision");
     document.getElementById("store-note").textContent = "Your answers are private to you and sync across your devices.";
     let first = true;
     col.onSnapshot(snap => {
       snap.docs.forEach(d => {
         if (!d.exists) return;
+        if (d.id === "vision") { if (!vDirty && !vSaving) vstore = JSON.parse(JSON.stringify(d.data())); return; }
         if (d.id === todayKey && (dirty || saving)) return; // keep what is being typed
         days[d.id] = JSON.parse(JSON.stringify(d.data()));
       });
       // first sync: push anything only this browser has for today
+      if (first && !snap.docs.some(d => d.id === "vision") && vstore.order.length) { vDirty = true; flushV(); }
       if (first) { first = false; if (!snap.docs.some(d => d.id === todayKey) && Object.keys(lsRead()[todayKey]?.answers || {}).length) { days[todayKey] = lsRead()[todayKey]; dirty = true; flush(); } }
       lsWrite();
       renderHeader();
       if (view === "board") renderBoard();
       else if (view === "wall") renderWall();
+      else if (view === "vision") { if (!holdT && !rankRun && !document.querySelector("#view-vision input:focus, #view-vision textarea:focus")) renderVision(); }
       else if (document.activeElement?.id !== "ans" && !breathTimer && !pauseTimer) renderRitual();
     }, () => { document.getElementById("store-note").textContent = "Sync paused. Your answers are saved in this browser."; });
   } catch (e) {}
